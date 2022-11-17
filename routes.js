@@ -54,6 +54,7 @@ const requestHandler = (req, res)=>{
 exports.reqHandler = requestHandler;
 exports.someText = 'hello there, from routes.js';
 
+// DOEST NOT WORK
 // exports = {
 //   reqHandler: requestHandler,
 //   someTextt: "hello there, from routes.js",
