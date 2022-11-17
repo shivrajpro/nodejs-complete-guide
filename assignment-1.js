@@ -38,13 +38,15 @@ const server = http.createServer((req, res)=>{
             body.push(chunk);
         })
 
-        return req.on('end', ()=>{
+        req.on('end', ()=>{
             const parsedBody = Buffer.concat(body).toString();
             const username = parsedBody.split("=")[1];
             console.log('username is',username);
-
-            return res.end();
         })
+
+        res.statusCode = 302;
+        res.setHeader("Location", '/');
+        res.end();
     }
 });
 
