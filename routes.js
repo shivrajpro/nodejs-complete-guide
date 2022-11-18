@@ -14,7 +14,7 @@ const requestHandler = (req, res)=>{
         const body = [];
     
         req.on('data', (chunk)=>{
-            console.log('chunk=',chunk);
+            // console.log('chunk=',chunk);
             body.push(chunk);
         })
     
@@ -30,6 +30,7 @@ const requestHandler = (req, res)=>{
             fs.writeFile("message.txt", message, err=>{
                 res.statusCode = 302;
                 res.setHeader('Location','/');
+                
                 return res.end();
             });
         })
