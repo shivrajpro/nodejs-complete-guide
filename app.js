@@ -13,13 +13,14 @@ const app = express();
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.engine('hbs',  expressHbs({
-    layoutsDir: 'views/layouts/',
-    defaultLayout: 'main-layout',
-    extname: 'hbs'
-})); //hbs will be the extension of file names
-app.set('view engine', 'hbs');// set the templating engine to be used
+// app.engine('hbs',  expressHbs({
+//     layoutsDir: 'views/layouts/',
+//     defaultLayout: 'main-layout',
+//     extname: 'hbs'
+// })); //hbs will be the extension of file names
+// app.set('view engine', 'hbs');// set the templating engine to be used
 // app.set('view engine', 'pug');// set the templating engine to be used
+app.set('view engine', 'ejs');
 app.set('views', 'views'); //folder in which our templates are kept
 app.use('/admin',adminData.routes);
 app.use(shopRoutes);
