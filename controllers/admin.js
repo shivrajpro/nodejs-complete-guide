@@ -4,12 +4,22 @@ const Product = require('../models/product');
 exports.getAddProduct = (req, res, next)=>{
     // res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
     // res.send('<form action="/admin/add-product" method="post"> <input type="text" placeholder="enter title" name="title"> <button type="submit">Add Product</button> </form>');
-    res.render('admin/add-product', {
+    res.render('admin/edit-product', {
         pageTitle: "Add Product",
-        path:"/admin/add-product",
-        formsCSS: true, 
-        productCSS: true, 
-        activeAddProduct: true
+        path:"/admin/add-product"
+    })
+}
+
+exports.getEditProduct = (req, res, next)=>{
+    const editMode = req.query.edit;
+    console.log("editMode=",editMode);
+    if(!editMode){
+        return res.redirect('/');
+    }
+    res.render('admin/edit-product', {
+        pageTitle: "Edit Product",
+        path:"/admin/edit-product",
+        editing: editMode === 'true'
     })
 }
 
