@@ -11,13 +11,14 @@ exports.getAddProduct = (req, res, next)=>{
 
 exports.getEditProduct = (req, res, next)=>{
     const editMode = req.query.edit;
-    // console.log("editMode=",editMode);
-    const prodId = req.params.productId;
-
     if(!editMode)
         return res.redirect('/');
 
-    Product.findById(prodId, product=>{
+    // console.log("editMode=",editMode);
+    const prodId = req.params.productId;
+
+    Product.findByPk(prodId)
+    .then(product=>{
         if(!product) return res.redirect('/');
 
         res.render('admin/edit-product', {
@@ -26,6 +27,9 @@ exports.getEditProduct = (req, res, next)=>{
             editing: editMode === 'true',
             product:product
         })
+    })
+    .catch(err=>{
+        console.log(err);
     })
 }
 
@@ -36,16 +40,20 @@ exports.postEditProduct = (req, res, next)=>{
     const updatedPrice = req.body.price;
     const updatedDesc = req.body.description;
 
-    const updatedProduct = new Product(
-        prodId,
-        updatedTitle,
-        updatedImgUrl,
-        updatedPrice,
-        updatedDesc
-    )
-    updatedProduct.save();
+    Product.findByPk(prodId)
+    .then(product=>{
+        product.title = updatedTitle;
+        product.price = updatedPrice;
+        product.imageUrl = updatedImgUrl;
+        product.description = updatedDesc;
 
-    res.redirect('/admin/products');
+        return product.save();
+    })
+    .then(result=>{
+        console.log("UPDATED PRODUCT!");
+        res.redirect('/admin/products');
+    })
+    .catch(err=>console.log(err))
 }
 
 exports.postAddProduct = (req, res, next)=>{
@@ -77,6 +85,18 @@ exports.postAddProduct = (req, res, next)=>{
 }
 
 exports.getProducts = (req, res, next)=>{
+    Product.findAll()
+    .then(products=>{
+        res.render('admin/product-list', {
+            prods:products, 
+            path:'/admin/products',
+            pageTitle:'Admin Products'
+        });
+    })
+    .catch(err=>{
+        console.log(err);
+    })
+    return;
     Product.fetchAll((products)=>{
         res.render('admin/product-list', {
             prods:products, 
