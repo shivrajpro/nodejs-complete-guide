@@ -4,6 +4,7 @@ const expressHbs = require('express-handlebars');
 
 const path = require('path');
 const rootDir = require('./util/path');
+const sequelize = require('./util/database');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -27,4 +28,10 @@ app.use('/admin',adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
-app.listen(3000); //creates a server on port
+
+sequelize.sync().then(result=>{
+    // console.log('result',result);
+    app.listen(3000); //creates a server on port
+}).catch(err=>{
+    console.log(err);
+})
