@@ -2,6 +2,8 @@
 const path = require("path");
 const fs = require("fs");
 const Cart = require("./cart");
+const db = require('../util/database');
+
 const p = path.join(
   path.dirname(require.main.filename),
   "data",
@@ -25,25 +27,9 @@ module.exports = class Product {
   }
 
   save() {
-    getProductsFromFile((products) => {
-      // if product exists, update it
-      if (this.id) {
-        const existingProductIndex = products.findIndex((p) => p.id === this.id);
-        const updatedProducts = [...products];
-
-        updatedProducts[existingProductIndex] = this;
-        fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
-          console.log(err);
-        });
-      } else { //create new product
-        this.id = Math.random().toString();
-        products.push(this);
-        
-        fs.writeFile(p, JSON.stringify(products), (err) => {
-          console.log(err);
-        });
-      }
-    });
+    return db.execute("INSERT INTO products (title, price, description, imageUrl) VALUES (?, ?, ?, ?)",
+    [this.title, this.price, this.description, this.imageUrl]
+    )
   }
 
   static deleteById(id){
@@ -60,14 +46,11 @@ module.exports = class Product {
   }
 
   static fetchAll(cb) {
-    getProductsFromFile(cb);
+    // getProductsFromFile(cb);
+    return db.execute("SELECT * FROM products");
   }
 
-  static findById(id, cb) {
-    getProductsFromFile((products) => {
-      const product = products.find((p) => p.id === id);
-      if (product) cb(product);
-      else cb({});
-    });
+  static findById(id) {
+    return db.execute("SELECT * FROM products WHERE products.id=?", [id]);
   }
 };

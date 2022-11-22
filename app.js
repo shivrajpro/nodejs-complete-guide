@@ -7,7 +7,6 @@ const rootDir = require('./util/path');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const db = require('./util/database');
 
 const errorController = require('./controllers/error');
 const app = express();
@@ -26,12 +25,6 @@ app.set('view engine', 'ejs');
 app.set('views', 'views'); //folder in which our templates are kept
 app.use('/admin',adminRoutes);
 app.use(shopRoutes);
-
-db.execute('SELECT * FROM products').then((data)=>{
-    console.log('data=',data[0]);
-}).catch(err=>{
-    console.log(err);
-})
 
 app.use(errorController.get404);
 app.listen(3000); //creates a server on port
