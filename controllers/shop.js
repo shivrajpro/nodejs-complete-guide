@@ -66,7 +66,7 @@ exports.getCart = (req, res, next) => {
   req.user
     .getCart()
     .then((cart) => {
-      console.log("CART", cart);
+    //   console.log("CART", cart);
       return cart.getProducts();
     })
     .then((products) => {
@@ -87,6 +87,8 @@ exports.postCart = (req, res, next) => {
 
   const prodId = req.body.productId;
   let fetchedCart;
+  let newQuantity = 1;
+
   req.user
     .getCart()
     .then((cart) => {
@@ -97,34 +99,39 @@ exports.postCart = (req, res, next) => {
       let product;
       if (products.length) product = products[0];
 
-      let newQuantity = 1;
       if (product) {
         //increase its quantity
+        let oldQuantity = product.cartItem.quantity;
+        newQuantity += oldQuantity;
+        return product;
       } //else add the entire product object to cart
-      return Product.findByPk(prodId)
-        .then((product) => {
-          fetchedCart.addProduct(product, {
-            through: { quantity: newQuantity }
-          });
-        })
-        .then(()=>{
-            res.redirect('/cart');
-        })
-        .catch((err) => console.log(err));
+      return Product.findByPk(prodId);
+    })
+    .then((product) => {
+      fetchedCart.addProduct(product, {
+        through: { quantity: newQuantity }
+      });
+      res.redirect("/cart");
     })
     .catch((err) => console.log(err));
-//   Product.findById(prodId, (product) => {
-//     Cart.addProduct(prodId, product.price);
-//   });
-//   res.redirect("/cart");
 };
 
 exports.postDeleteCartItem = (req, res, next) => {
+  //to delete prod from cart, we need to call destroy on cartItem   
   const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.deleteProduct(prodId, product.price);
+  req.user.getCart()
+  .then(cart=>{
+    return cart.getProducts({where:{id:prodId}})
+  })
+  .then(products=>{
+    const product = products[0];
+    return product.cartItem.destroy();
+  })
+  .then(result=>{
+    console.log('DELETEED CARTITEM');
     res.redirect("/cart");
-  });
+  })
+  .catch(err=>console.log(err))
 };
 
 exports.getOrders = (req, res, next) => {
