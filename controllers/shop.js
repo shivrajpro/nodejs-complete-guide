@@ -135,11 +135,49 @@ exports.postDeleteCartItem = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  res.render("shop/orders", {
-    path: "/orders",
-    pageTitle: "Your Orders",
-  });
+  req.user.getOrders({include:['products']}) // as we have belongsToMany realtion
+  .then((orders)=>{
+    console.log('ORDERS',orders);
+    res.render("shop/orders", {
+      path: "/orders",
+      pageTitle: "Your Orders",
+      orders:orders
+    });
+  })
+
 };
+
+exports.postOrder = (req, res, next)=>{
+  let fetchedCart;
+  req.user
+    .getCart()
+    .then((cart) => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
+    .then((products) => {
+      // console.log('PRODUCTS',products);
+      return req.user
+        .createOrder()
+        .then((order) => {
+          return order.addProducts(
+            products.map((product) => {
+              product.orderItem = { quantity: product.cartItem.quantity }; //need to be used to show in orders page
+              return product;
+            })
+          );
+        })
+        .catch((err) => console.log(err));
+    })
+    .then(()=>{
+      return fetchedCart.setProducts(null); //empty cart after checkout
+    })
+    .then((result) => {
+      // console.log("RESULT", result);
+      res.redirect("/orders");
+    })
+    .catch((err) => console.log(err));
+}
 
 exports.getCheckout = (req, res, next) => {
   res.render("shop/checkout", {

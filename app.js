@@ -15,6 +15,8 @@ const Product = require("./models/product");
 const User = require("./models/user");
 const Cart = require("./models/cart");
 const CartItem = require("./models/cart-item");
+const Order = require("./models/order");
+const OrderItem = require("./models/order-item");
 
 const app = express();
 
@@ -51,11 +53,13 @@ User.hasOne(Cart);
 Cart.belongsTo(User); //OPTIONAL: as it the inverse of above relation
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsTo(Cart, { through: CartItem });
-
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: OrderItem });
 // force flag will create new tables everytime, should not be used in prod
 // need to run this flag whenever a new association is created
 sequelize
-//   .sync({force:true})
+  // .sync({ force: true })
   .sync()
   .then((result) => {
     return User.findByPk(1);

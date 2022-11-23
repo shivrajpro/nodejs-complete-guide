@@ -5,5 +5,22 @@
         <%- include('../includes/navigation.ejs') %>
         <main>
             <h1>Your Orders</h1>
+            <ul>
+                <% orders.forEach(order=>{%>
+                    <li>
+                        <h1># <%= order.id %> </h1>
+                        <ul>
+                            <% order.products.forEach(product=>{%>
+                                <li>
+                                    <p> 
+                                        <%= product.title %> 
+                                        (<%= product.orderItem.quantity %>) 
+                                    </p>
+                                </li>
+                            <%}) %>
+                        </ul>
+                    </li>                        
+                <%}) %>
+            </ul>
         </main>
         <%- include('../includes/end.ejs') %>
