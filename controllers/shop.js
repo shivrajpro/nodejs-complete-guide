@@ -32,9 +32,10 @@ exports.getProducts = (req, res, next) => {
 exports.getProductById = (req, res, next) => {
   const prodId = req.params.productId;
   // console.log('prodId',prodId);
-  Product.findByPk(prodId)
+  Product.findById(prodId)
     .then((product) => {
-      // console.log("product=",product);
+      console.log("product=",product);
+      if(!product) return res.redirect('/')
       res.render("shop/product-detail", {
         pageTitle: product.title,
         path: "/products",
