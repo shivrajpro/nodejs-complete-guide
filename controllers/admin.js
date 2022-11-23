@@ -63,23 +63,28 @@ exports.postAddProduct = (req, res, next)=>{
     const price = req.body.price;
     const description = req.body.description;
 
+    const product = new Product(title, price, imageUrl, description);
+    product.save().then(result=>{
+        console.log('RESULT',result)
+        res.redirect('/admin/products')
+    }).catch(err=>console.log(err))
     //here we can either simply pass userId field else use the sequelize method
     // which are available after creating associations in app.js
-    req.user.createProduct({
-        title:title,
-        price:price,
-        imageUrl: imageUrl,
-        description: description
-    })
-    .then(result=>{
-        res.redirect('/admin/products')
-    }).catch(err=>{
-        console.log(err);
-    })
+    // req.user.createProduct({
+    //     title:title,
+    //     price:price,
+    //     imageUrl: imageUrl,
+    //     description: description
+    // })
+    // .then(result=>{
+    //     res.redirect('/admin/products')
+    // }).catch(err=>{
+    //     console.log(err);
+    // })
 }
 
 exports.getProducts = (req, res, next)=>{
-    Product.findAll()
+    Product.fetchAll()
     .then(products=>{
         res.render('admin/product-list', {
             prods:products, 
