@@ -7,7 +7,7 @@ class Product {
     this.price = price;
     this.imageUrl = imageUrl;
     this.description = description;
-    this._id = id; //will be undefined in case of new product
+    this._id = id ? new mongodb.ObjectId(id) : null; //will be undefined in case of new product
   }
 
   save() {
@@ -18,13 +18,7 @@ class Product {
       dbOp = db
         .collection("products")
         .updateOne({ _id: new mongodb.ObjectId(this._id) }, 
-        { $set: {
-          title:this.title,
-          price: this.price,
-          description: this.description,
-          imageUrl: this.imageUrl
-        } 
-      });
+        { $set: this});
     } else {
       dbOp = db.collection("products").insertOne(this);
     }
