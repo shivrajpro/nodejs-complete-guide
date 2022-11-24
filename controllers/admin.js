@@ -11,15 +11,13 @@ exports.getAddProduct = (req, res, next)=>{
 
 exports.getEditProduct = (req, res, next)=>{
     const editMode = req.query.edit;
-    if(!editMode)
-        return res.redirect('/');
+    
+    if(!editMode) return res.redirect('/');
 
     const prodId = req.params.productId;
 
-    // Product.findByPk(prodId)
-    req.user.getProducts({where:{id: prodId}})
-    .then(products=>{
-        const product = products[0];
+    Product.findById(prodId)
+    .then(product=>{
         if(!product) return res.redirect('/');
 
         res.render('admin/edit-product', {
@@ -31,7 +29,7 @@ exports.getEditProduct = (req, res, next)=>{
     })
     .catch(err=>{
         console.log(err);
-    })
+    })    
 }
 
 exports.postEditProduct = (req, res, next)=>{
@@ -100,13 +98,9 @@ exports.getProducts = (req, res, next)=>{
 exports.postDeleteProduct = (req, res, next)=>{
     const prodId = req.body.productId;
 
-    Product.findByPk(prodId)
+    Product.deleteById(prodId)
     .then(product=>{
-        return product.destroy();
-    })
-    .then(()=>{
-        console.log('PRODUCT DESTROYED!!');
+        res.redirect('/admin/products');
     })
     .catch(err=>console.log(err))
-    res.redirect('/');
 }
