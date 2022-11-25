@@ -94,8 +94,8 @@ exports.postCart = (req, res, next) => {
 exports.postDeleteCartItem = (req, res, next) => {
   //to delete prod from cart, we need to call destroy on cartItem   
   const prodId = req.body.productId;
-  console.log("prodId", prodId)
-  req.user.deleteCartItem(prodId, req.user._id)
+  // console.log("prodId", prodId)
+  req.user.deleteCartItem(prodId)
   .then(result=>{
     // console.log('RESULT',result);
     res.redirect('/cart');
