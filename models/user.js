@@ -56,6 +56,8 @@ class User {
 
   getCart() {
     // need to return all the products info which are in user's cart
+    // also we should check if a product in cart items is present in products collection
+    // so that products delete by admin will not be present in any cart
     const db = getDb();
     const productIds = this.cart.items.map((i) => i.productId);
 
