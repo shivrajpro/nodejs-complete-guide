@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public"))); //public folder contains static resources like js and css
 
 app.use((req, res, next) => {
-  User.findById('6380559458986011e8d9a617')
+  User.findById('6380f66dfdf40701a99c47c5')
   .then(user=>{
     // console.log("USER",user);
     req.user = user;
