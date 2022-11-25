@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 
 const mongoConnect = require('./util/database').mongoConnect;
+const mongoose = require('mongoose');
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -32,8 +33,12 @@ app.set("view engine", "ejs");
 app.set("views", "views"); //folder in which our templates are kept
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
-
-mongoConnect(()=>{
-  app.listen(3000);
-})
 app.use(errorController.get404);
+
+mongoose.connect('mongodb+srv://shivraj:shiv@cluster0.bu9ow60.mongodb.net/?retryWrites=true&w=majority')
+.then(result=>{
+  console.log("CONNECTED");
+  app.listen(3000);
+}).then(e=>{
+  console.log(e);
+})
