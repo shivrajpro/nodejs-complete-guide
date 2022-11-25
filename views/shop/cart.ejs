@@ -11,7 +11,7 @@
                         <li>
                             <div>
                                 <p>
-                                    <%= p.title %> (<%=p.cartItem.quantity%>)
+                                    <%= p.title %> (<%=p.quantity%>)
                                 </p>
                                 <form action="/delete-cart-item" method="post">
                                     <input type="hidden" name="productId" value="<%=p.id%>" >
