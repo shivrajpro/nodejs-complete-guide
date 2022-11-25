@@ -1,34 +1,28 @@
 <%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/orders.css">
     </head>
 
     <body>
         <%- include('../includes/navigation.ejs') %>
             <main>
-                <% if(orders.length> 0) {%>
-                    <div>
-                        <h1>Your Orders</h1>
-
-                        <ul>
-                            <% orders.forEach(order=>{%>
-                                <li>
-                                    <h1># <%= order._id %>
+                <% if (orders.length <=0) { %>
+                    <h1>Nothing there!</h1>
+                    <% } else { %>
+                        <ul class="orders">
+                            <% orders.forEach(order=> { %>
+                                <li class="orders__item">
+                                    <h1>Order - # <%= order._id %>
                                     </h1>
-                                    <ul>
-                                        <% order.items.forEach(product=>{%>
-                                            <li>
-                                                <p>
-                                                    <%= product.title %>
-                                                        (<%= product.quantity %>)
-                                                </p>
+                                    <ul class="orders__products">
+                                        <% order.items.forEach(product=> { %>
+                                            <li class="orders__products-item">
+                                                <%= product.title %> (<%= product.quantity %>)
                                             </li>
-                                            <%}) %>
+                                            <% }); %>
                                     </ul>
                                 </li>
+                                <% }); %>
                         </ul>
-                        <%})%>
-                    </div>
-                    <%} else {%>
-                        <h1>You don't have any orders</h1>
-                        <%}%>
+                        <% } %>
             </main>
             <%- include('../includes/end.ejs') %>
