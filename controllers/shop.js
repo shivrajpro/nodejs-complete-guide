@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const User = require("../models/user");
 
 exports.getIndex = (req, res, next) => {
   Product.fetchAll()
@@ -93,17 +94,11 @@ exports.postCart = (req, res, next) => {
 exports.postDeleteCartItem = (req, res, next) => {
   //to delete prod from cart, we need to call destroy on cartItem   
   const prodId = req.body.productId;
-  req.user.getCart()
-  .then(cart=>{
-    return cart.getProducts({where:{id:prodId}})
-  })
-  .then(products=>{
-    const product = products[0];
-    return product.cartItem.destroy();
-  })
+  console.log("prodId", prodId)
+  req.user.deleteCartItem(prodId, req.user._id)
   .then(result=>{
-    console.log('DELETEED CARTITEM');
-    res.redirect("/cart");
+    // console.log('RESULT',result);
+    res.redirect('/cart');
   })
   .catch(err=>console.log(err))
 };

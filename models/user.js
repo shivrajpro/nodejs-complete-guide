@@ -25,6 +25,8 @@ class User {
 
   addToCart(product) {
     let newQuantity = 1;
+    if(!this.cart.items) this.cart.items = [];
+  
     let existingProductIndex = this.cart.items.findIndex(
       (i) => i.productId.toString() === product._id.toString()
     );
@@ -75,6 +77,19 @@ class User {
       });
   }
 
+  deleteCartItem(productId, userId){
+    const db = getDb();
+    const updateCartItems = this.cart.items.filter(i=>i.productId.toString() !== productId);
+
+    return db.collection("users").updateOne(
+      {_id: new mongodb.ObjectId(userId)},
+      {$set:{
+        cart:{
+          items:updateCartItems
+        }
+      }}
+    )
+  }
   static findById(userId) {
     const db = getDb();
 
