@@ -88,12 +88,43 @@ class User {
       {
         $set: {
           cart: {
-            items: updateCartItems
-          }
-        }
+            items: updateCartItems,
+          },
+        },
       }
     );
   }
+
+  addOrder() {
+    //put the cart items in orders and empty the cart
+    const db = getDb();
+
+    // get cart gives the cart items with product info
+    return this.getCart().then((products) => {
+      const order = {
+        items: products,
+        user: {
+          _id: this._id,
+          username: this.username,
+        },
+      };
+      db.collection("orders").insertOne(order);
+
+      return db
+        .collection("users")
+        .updateOne({ _id: this._id }, { $set: { cart: { items: [] } } });
+    });
+  }
+
+  getOrders() {
+    const db = getDb();
+
+    return db
+      .collection("orders")
+      .find({ "user._id": new mongodb.ObjectId(this._id) })
+      .toArray();
+  }
+
   static findById(userId) {
     const db = getDb();
 
