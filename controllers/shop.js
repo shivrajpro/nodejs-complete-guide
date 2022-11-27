@@ -65,8 +65,10 @@ exports.getProductById = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
-    .then((products) => {
+    .populate("cart.items.productId")
+    .then((user) => {
+      // console.log("PRODUCTS",user.cart.items);
+      const products = user.cart.items;
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
@@ -78,8 +80,6 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
-  let fetchedCart;
-  let newQuantity = 1;
 
   Product.findById(prodId)
   .then(product=>{
@@ -95,7 +95,7 @@ exports.postDeleteCartItem = (req, res, next) => {
   //to delete prod from cart, we need to call destroy on cartItem   
   const prodId = req.body.productId;
   // console.log("prodId", prodId)
-  req.user.deleteCartItem(prodId)
+  req.user.removeFromCart(prodId)
   .then(result=>{
     // console.log('RESULT',result);
     res.redirect('/cart');
