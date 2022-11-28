@@ -1,3 +1,4 @@
+const Order = require("../models/order");
 const Product = require("../models/product");
 const User = require("../models/user");
 
@@ -104,26 +105,41 @@ exports.postDeleteCartItem = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  req.user.getOrders() // as we have belongsToMany realtion
-  .then((orders)=>{
-    // console.log('ORDERS',orders);
-    res.render("shop/orders", {
-      path: "/orders",
-      pageTitle: "Your Orders",
-      orders:orders || []
-    });
-  })
-
+  Order.find({ 'user.userId': req.user._id })
+    .then(orders => {
+      res.render('shop/orders', {
+        path: '/orders',
+        pageTitle: 'Your Orders',
+        orders: orders
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.postOrder = (req, res, next)=>{
   req.user
-    .addOrder()
-    .then((result) => {
-      // console.log("RESULT", result);
-      res.redirect("/orders");
+    .populate("cart.items.productId")
+    .then((user) => {
+      // console.log("PRODUCTS",user.cart.items);
+      const products = user.cart.items.map(i=> {
+        return {quantity: i.quantity, product: i.productId._doc}
+      });
+
+      const order = new Order({
+        user:{
+          username:req.user.username,
+          userId: req.user
+        },
+        products
+      })
+
+      return order.save();
+    }).then(()=>{
+      req.user.clearCart();
+      return res.redirect('/orders');
     })
     .catch((err) => console.log(err));
+  
 }
 
 exports.getCheckout = (req, res, next) => {
