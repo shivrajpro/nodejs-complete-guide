@@ -33,15 +33,16 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  User.findById("6380f66dfdf40701a99c47c5")
-    .then((user) => {
-      // console.log("USER",user);
-      req.user = user;
-      next();
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  // User.findById("6380f66dfdf40701a99c47c5")
+  //   .then((user) => {
+  //     // console.log("USER",user);
+  //     req.user = user;
+  //     next();
+  //   })
+  //   .catch((e) => {
+  //     console.log(e);
+  //   });
+  next();
 });
 
 app.set("view engine", "ejs");
@@ -56,21 +57,21 @@ mongoose
   .then((result) => {
     console.log("CONNECTED");
 
-    User.findById("6380f66dfdf40701a99c47c5")
-      .then((user) => {
-        if (!user) {
-          const user = new User({
-            username: "shivraj",
-            email: "shivraj@test.com",
-            cart: {
-              items: [],
-            },
-          });
+    // User.findById("6380f66dfdf40701a99c47c5")
+    //   .then((user) => {
+    //     if (!user) {
+    //       const user = new User({
+    //         username: "shivraj",
+    //         email: "shivraj@test.com",
+    //         cart: {
+    //           items: [],
+    //         },
+    //       });
 
-          user.save();
-        }
-      })
-      .catch((e) => console.log(e));
+    //       user.save();
+    //     }
+    //   })
+    //   .catch((e) => console.log(e));
     app.listen(3000);
   })
   .then((e) => {
