@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const authRoutes = require('./routes/auth');
 
 const errorController = require("./controllers/error");
 const User = require("./models/user");
@@ -32,6 +33,7 @@ app.set("view engine", "ejs");
 app.set("views", "views"); //folder in which our templates are kept
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose.connect('mongodb+srv://shivraj:shiv@cluster0.bu9ow60.mongodb.net/shop')

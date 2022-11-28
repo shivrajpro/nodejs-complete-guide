@@ -36,7 +36,7 @@ exports.getProductById = (req, res, next) => {
   // console.log('prodId',prodId);
   Product.findById(prodId)
     .then((product) => {
-      console.log("product=",product);
+      // console.log("product=",product);
       if(!product) return res.redirect('/')
       res.render("shop/product-detail", {
         pageTitle: product.title,
