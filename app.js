@@ -33,16 +33,17 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  // User.findById("6380f66dfdf40701a99c47c5")
-  //   .then((user) => {
-  //     // console.log("USER",user);
-  //     req.user = user;
-  //     next();
-  //   })
-  //   .catch((e) => {
-  //     console.log(e);
-  //   });
-  next();
+  if(!req.session.user) return next();
+
+  User.findById("6380f66dfdf40701a99c47c5")
+    .then((user) => {
+      // console.log("USER",user);
+      req.user = user;
+      next();
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 });
 
 app.set("view engine", "ejs");

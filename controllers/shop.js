@@ -68,7 +68,7 @@ exports.getProductById = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  req.session.user
+  req.user
     .populate("cart.items.productId")
     .then((user) => {
       // console.log("PRODUCTS",user.cart.items);
@@ -88,7 +88,7 @@ exports.postCart = (req, res, next) => {
 
   Product.findById(prodId)
   .then(product=>{
-    return req.session.user.addToCart(product);
+    return req.user.addToCart(product);
   })
   .then(()=>{
     res.redirect("/cart");
@@ -100,7 +100,7 @@ exports.postDeleteCartItem = (req, res, next) => {
   //to delete prod from cart, we need to call destroy on cartItem   
   const prodId = req.body.productId;
   // console.log("prodId", prodId)
-  req.session.user.removeFromCart(prodId)
+  req.user.removeFromCart(prodId)
   .then(result=>{
     // console.log('RESULT',result);
     res.redirect('/cart');
@@ -109,7 +109,7 @@ exports.postDeleteCartItem = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  Order.find({ 'user.userId': req.session.user._id })
+  Order.find({ 'user.userId': req.user._id })
     .then(orders => {
       res.render('shop/orders', {
         path: '/orders',
@@ -122,7 +122,7 @@ exports.getOrders = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next)=>{
-  req.session.user
+  req.user
     .populate("cart.items.productId")
     .then((user) => {
       // console.log("PRODUCTS",user.cart.items);
@@ -132,15 +132,15 @@ exports.postOrder = (req, res, next)=>{
 
       const order = new Order({
         user:{
-          username:req.session.user.username,
-          userId: req.session.user
+          username:req.user.username,
+          userId: req.user
         },
         products
       })
 
       return order.save();
     }).then(()=>{
-      req.session.user.clearCart();
+      req.user.clearCart();
       return res.redirect('/orders');
     })
     .catch((err) => console.log(err));
