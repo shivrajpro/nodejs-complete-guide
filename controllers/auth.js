@@ -16,7 +16,7 @@ exports.postLogin = (req, res, next)=>{
     User.findById("6380f66dfdf40701a99c47c5")
       .then((user) => {
         if (!user) {
-          const user = new User({
+          user = new User({
             username: "shivraj",
             email: "shivraj@test.com",
             cart: {
@@ -25,14 +25,13 @@ exports.postLogin = (req, res, next)=>{
           });
 
           user.save();
-          req.session.user = user;
-          req.session.isLoggedIn = true;
-          res.redirect('/')
-        }else{
-            req.session.user = user;
-            req.session.isLoggedIn = true;
-            res.redirect('/')
         }
+        req.session.user = user;
+        req.session.isLoggedIn = true;
+        req.session.save((err)=>{
+          console.log(err);
+          res.redirect('/')
+        })
       })
       .catch((e) => console.log(e));    
 }
