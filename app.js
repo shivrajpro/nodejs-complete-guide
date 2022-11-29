@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const path = require("path");
+const flash = require('connect-flash');
 
 const MONGODB_URI =
   "mongodb+srv://shivraj:shiv@cluster0.bu9ow60.mongodb.net/shop";
@@ -35,7 +36,7 @@ app.use(
 app.use((req, res, next) => {
   if(!req.session.user) return next();
 
-  User.findById("6380f66dfdf40701a99c47c5")
+  User.findById(req.session.user._id)
     .then((user) => {
       // console.log("USER",user);
       req.user = user;
@@ -45,7 +46,12 @@ app.use((req, res, next) => {
       console.log(e);
     });
 });
-
+app.use((req, res, next) => {
+  res.locals.isAuth = req.session.isLoggedIn; 
+  //this variable will be sent to every view we render
+  next();
+});
+app.use(flash());
 app.set("view engine", "ejs");
 app.set("views", "views"); //folder in which our templates are kept
 app.use("/admin", adminRoutes);
@@ -57,22 +63,6 @@ mongoose
   .connect(MONGODB_URI)
   .then((result) => {
     console.log("CONNECTED");
-
-    // User.findById("6380f66dfdf40701a99c47c5")
-    //   .then((user) => {
-    //     if (!user) {
-    //       const user = new User({
-    //         username: "shivraj",
-    //         email: "shivraj@test.com",
-    //         cart: {
-    //           items: [],
-    //         },
-    //       });
-
-    //       user.save();
-    //     }
-    //   })
-    //   .catch((e) => console.log(e));
     app.listen(3000);
   })
   .then((e) => {
