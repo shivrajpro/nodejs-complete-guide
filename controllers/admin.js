@@ -45,11 +45,16 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(prodId)
     .then((product) => {
-      product.title = updatedTitle;
-      product.imageUrl = updatedImgUrl;
-      product.price = updatedPrice;
-      product.description = updatedDesc;
-      return product.save();
+      //unauthorized user should not be allowed to edit product
+      if(product.userId === req.user._id){
+        product.title = updatedTitle;
+        product.imageUrl = updatedImgUrl;
+        product.price = updatedPrice;
+        product.description = updatedDesc;
+        return product.save();
+      }else{
+        return res.redirect('/');
+      }
     })
     .then((result) => {
       console.log("UPDATED PRODUCT!");
@@ -82,7 +87,7 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({userId: req.user._id})
     .then((products) => {
       res.render("admin/product-list", {
         prods: products,
@@ -99,7 +104,7 @@ exports.getProducts = (req, res, next) => {
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
 
-  Product.findByIdAndRemove(prodId)
+  Product.deleteOne({_id: prodId, userId: req.user._id})
     .then((product) => {
       res.redirect("/admin/products");
     })
