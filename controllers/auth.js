@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
+const crypto  = require('crypto');
 
 const transport = nodemailer.createTransport({
   host: "smtp.mailtrap.io",
@@ -126,4 +127,56 @@ exports.getResetPassword = (req, res, next) => {
     errorMsg: message,
   });
 };
+
+exports.postResetPassword = (req, res, next)=>{
+  crypto.randomBytes(32, (err, buffer)=>{
+    if(err){
+      console.log(err);
+      return res.redirect('/reset-password');
+    }
+
+    //get the user with email
+    // store the token
+    // send email if account exists else throw error
+    const token = buffer.toString('hex');
+    User.findOne({email:req.body.email})
+    .then(user=>{
+      if(!user){
+        req.flash('error',"No account with that email exists");
+        return res.redirect('/reset-password');
+      }
+
+      user.resetToken = token;
+      user.resetTokenExpiration = Date.now() + 60*60*1000;
+
+      return user.save();
+    })
+    .then(result=>{
+      const mailOptions = {
+        from: '"NodeJS Team" <shop@node-complete.com>',
+        to: req.body.email,
+        subject: "Flopkert - Password Reset",
+        html:`
+        <p>You requested a password reset</p>
+        <p>Click this 
+        <a href="http://localhost:3000/reset-password/${token}">link</a>
+        to reset your password
+        </p>
+        `
+      };
+      transport.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
+      
+      return res.redirect('/');
+    })
+    .catch(e=>{
+      console.log(e)
+    })
+  })
+}
 
