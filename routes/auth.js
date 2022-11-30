@@ -9,7 +9,7 @@ router.post("/login", [
   check("email")
   .isEmail()
   .withMessage("Please enter a valid email"),
-  body('password', "Please enter a valid password")
+  body('password', "Password must contain atleast 5 characters")
   .isLength({min:5})
   .isAlphanumeric()
 ], 
