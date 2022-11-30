@@ -21,6 +21,8 @@ router.post(
   [
     check("email")
       .isEmail()
+      .trim()
+      .normalizeEmail() //for sanitizing
       .withMessage("Please enter a valid email")
       .custom((value, { req }) => {
         return User.findOne({ email: value })
