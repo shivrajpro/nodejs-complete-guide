@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
+const multer = require('multer');
 const MongoDBStore = require("connect-mongodb-session")(session);
 const path = require("path");
 const flash = require('connect-flash');
@@ -24,6 +25,14 @@ const store = new MongoDBStore({
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public"))); //public folder contains static resources like js and css
 
+const fileStorage = multer.diskStorage({
+  destination:(req, file, cb)=>{
+    cb(null, 'images')
+  },
+  filename: (req, file, cb)=>{
+    cb(null, new Date().toISOString() + "-" + file.originalname)
+  }
+})
 app.use(
   session({
     secret: "my secret",
@@ -55,6 +64,8 @@ app.use((req, res, next) => {
   next();
 });
 app.use(flash());
+// app.use(multer({dest:'images'}).single('image'));
+app.use(multer({storage: fileStorage}).single('image'));
 app.set("view engine", "ejs");
 app.set("views", "views"); //folder in which our templates are kept
 app.use("/admin", adminRoutes);
