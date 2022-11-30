@@ -1,10 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const multer = require('multer');
+const multer = require("multer");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const path = require("path");
-const flash = require('connect-flash');
+const flash = require("connect-flash");
 
 const MONGODB_URI =
   "mongodb+srv://shivraj:shiv@cluster0.bu9ow60.mongodb.net/shop";
@@ -24,15 +24,26 @@ const store = new MongoDBStore({
 });
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public"))); //public folder contains static resources like js and css
+app.use("/images",express.static(path.join(__dirname, "images"))); //public folder contains static resources like js and css
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/jpg"
+  )
+    cb(null, true);
+  else cb(null, false);
+};
 
 const fileStorage = multer.diskStorage({
-  destination:(req, file, cb)=>{
-    cb(null, 'images')
+  destination: (req, file, cb) => {
+    cb(null, "images");
   },
-  filename: (req, file, cb)=>{
-    cb(null, new Date().toISOString() + "-" + file.originalname)
+  filename: (req, file, cb) => {
+    cb(null, (Date.now() + "-" + file.originalname).replace(/:/g,"/"));
   }
-})
+});
 app.use(
   session({
     secret: "my secret",
@@ -43,12 +54,12 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  if(!req.session.user) return next();
+  if (!req.session.user) return next();
 
   User.findById(req.session.user._id)
     .then((user) => {
       // console.log("USER",user);
-      if(!user) return next();
+      if (!user) return next();
 
       req.user = user;
       next();
@@ -59,25 +70,26 @@ app.use((req, res, next) => {
     });
 });
 app.use((req, res, next) => {
-  res.locals.isAuth = req.session.isLoggedIn; 
+  res.locals.isAuth = req.session.isLoggedIn;
   //this variable will be sent to every view we render
   next();
 });
 app.use(flash());
 // app.use(multer({dest:'images'}).single('image'));
-app.use(multer({storage: fileStorage}).single('image'));
+app.use(multer({storage: fileStorage, fileFilter}).single("image"));
+
 app.set("view engine", "ejs");
 app.set("views", "views"); //folder in which our templates are kept
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.get('/500', errorController.get500);
+app.get("/500", errorController.get500);
 
 app.use(errorController.get404);
-app.use((error, req, res, next)=>{
-  res.redirect('/500');
-})
+app.use((error, req, res, next) => {
+  res.redirect("/500");
+});
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
