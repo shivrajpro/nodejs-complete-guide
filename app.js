@@ -39,11 +39,14 @@ app.use((req, res, next) => {
   User.findById(req.session.user._id)
     .then((user) => {
       // console.log("USER",user);
+      if(!user) return next();
+
       req.user = user;
       next();
     })
     .catch((e) => {
-      console.log(e);
+      // console.log(e);
+      throw new Error(e);
     });
 });
 app.use((req, res, next) => {
@@ -57,8 +60,13 @@ app.set("views", "views"); //folder in which our templates are kept
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
-app.use(errorController.get404);
 
+app.get('/500', errorController.get500);
+
+app.use(errorController.get404);
+app.use((error, req, res, next)=>{
+  res.redirect('/500');
+})
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
