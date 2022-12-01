@@ -2,6 +2,7 @@
 const Product = require("../models/product");
 const {validationResult} = require('express-validator');
 const mongoose = require('mongoose');
+const fileHelper = require('../util/file');
 
 exports.getAddProduct = (req, res, next) => {
   if(!req.session.user) return res.redirect('/login');
@@ -77,7 +78,10 @@ exports.postEditProduct = (req, res, next) => {
       //unauthorized user should not be allowed to edit product
       if(product.userId === req.user._id){
         product.title = updatedTitle;
-        product.imageUrl = imagePath;
+        if(imagePath){
+          fileHelper.deleteFile(product.imageUrl);
+          product.imageUrl = imagePath;
+        }
         product.price = updatedPrice;
         product.description = updatedDesc;
         return product.save();
@@ -197,9 +201,15 @@ exports.getProducts = (req, res, next) => {
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
 
-  Product.deleteOne({_id: prodId, userId: req.user._id})
-    .then((product) => {
-      res.redirect("/admin/products");
-    })
-    .catch((err) => console.log(err));
+  Product.findById(prodId)
+  .then(product=>{
+    if(!product) return next(new Error("Product not found"));
+    fileHelper.deleteFile(product.imageUrl.slice(1));
+    return Product.deleteOne({_id: prodId, userId: req.user._id}) 
+  })
+  .then((product) => {
+    res.redirect("/admin/products");
+  })
+  .catch((err) => next(err));
+
 };
