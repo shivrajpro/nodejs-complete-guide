@@ -18,5 +18,19 @@
             <div class="centered">
                 <h2>Total: <%=totalSum%> </h2>
             </div>
+            <div class="centered">
+                <button id="order-btn" class="btn">Order</button>
+                <script src="https://js.stripe.com/v3/"></script>
+                <script>
+                    // Set your publishable key: remember to change this to your live publishable key in production
+                const stripe = Stripe('pk_test_51MAGVfSDBzPpT6ABfAaLA9frYAEeqM12KBW8LLIcWl7CGCcfFi0y3UG5JaANjaqvuOohBSKmdhbnURNLHqiBPsBU00G1SkBRYu');
+                const orderBtn = document.getElementById('order-btn');
+                orderBtn.addEventListener('click', function () {
+                    stripe.redirectToCheckout({
+                        sessionId:"<%= sessionId %>"
+                    });
+                })
+                </script>
+            </div>
         </main>
 <%- include('../includes/end.ejs') %>
