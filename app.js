@@ -39,6 +39,7 @@ const fileFilter = (req, file, cb) => {
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "images");
+    //folder name in which images will be stored and the same will be included to add the images in DB
   },
   filename: (req, file, cb) => {
     cb(null, (Date.now() + "-" + file.originalname).replace(/:/g,"/"));
@@ -84,12 +85,14 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.get("/500", errorController.get500);
 
 app.use(errorController.get404);
 app.use((error, req, res, next) => {
+  console.log(error);
   res.redirect("/500");
 });
+app.get("/500", errorController.get500);
+
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
