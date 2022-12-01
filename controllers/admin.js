@@ -51,7 +51,7 @@ exports.postEditProduct = (req, res, next) => {
   const updatedImage = req.file;
   const updatedPrice = req.body.price;
   const updatedDesc = req.body.description;
-  const imagePath = updatedImage.path.replace(/\\/g, "/");
+  const imagePath = "/"+updatedImage.path.replace(/\\/g, "/");
 
   const errors = validationResult(req);
 
@@ -63,7 +63,6 @@ exports.postEditProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: updatedTitle,
-        imageUrl: imagePath,
         price: updatedPrice,
         description: updatedDesc,
         _id: prodId
@@ -104,10 +103,10 @@ exports.postAddProduct = (req, res, next) => {
   const description = req.body.description;
   const errors = validationResult(req);
 
-  const imagePath = image.path.replace(/\\/g, "/");
+  const imagePath = "/"+image.path.replace(/\\/g, "/");
 
   
-  console.log("IMAGE",imagePath);
+  // console.log("IMAGE",imagePath);
   if(!image){
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Add Product',
@@ -116,7 +115,6 @@ exports.postAddProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: title,
-        imageUrl: imagePath,
         price: price,
         description: description
       },
@@ -133,7 +131,6 @@ exports.postAddProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: title,
-        imageUrl: image,
         price: price,
         description: description
       },
