@@ -168,13 +168,34 @@ exports.getCheckout = (req, res, next) => {
 
 exports.getInvoice = (req, res, next)=>{
   const orderId = req.params.orderId;
-  const invoiceName = 'invoice-'+orderId+".pdf";
-  const invoicePath = path.join('data', 'invoices', invoiceName);
 
-  console.log("invoicepath",invoicePath);
-  fs.readFile(invoicePath, (err, data)=>{
-    console.log("data",data);
-    if(err) return next(err);
-    res.send(data);
+  Order.findById(orderId)
+  .then(order=>{
+    if(!order) return next(new Error("Order not dound"));
+
+    if(order.user.userId.toString() !== req.user._id.toString())
+      return next(new Error('Unauthorized'));
+
+    const invoiceName = 'invoice-'+orderId+".pdf";
+    const invoicePath = path.join('data', 'invoices', invoiceName);
+
+    //with this function, file data is read into memory, which might overflow when there
+    // are huge incoming requests and file size is large
+    // fs.readFile(invoicePath, (err, data)=>{
+    //   // console.log("data",data);
+    //   if(err) return next(err);
+
+    //   res.setHeader('Content-Type', 'application/pdf');
+    //   res.setHeader('Content-Disposition', 'inline; filename="'+invoiceName+'"');
+    //   res.send(data);
+    // })
+      
+    // with this method, the entire data is not loaded in memory
+    // instead the data is sent to browser chunk by chunk
+    const file = fs.createReadStream(invoicePath);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="'+invoiceName+'"');
+    file.pipe(res);
   })
+  .catch(e=>console.log(e));
 }
