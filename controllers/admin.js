@@ -3,7 +3,7 @@ const Product = require("../models/product");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 const fileHelper = require("../util/file");
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 10;
 
 exports.getAddProduct = (req, res, next) => {
   if (!req.session.user) return res.redirect("/login");
@@ -185,7 +185,7 @@ exports.getProducts = (req, res, next) => {
   const page = +req.query.page || 1;
   let totalItems;
 
-  Product.find()
+  Product.find({userId: req.user._id})
     .countDocuments()
     .then((numProducts) => {
       totalItems = numProducts;
@@ -240,4 +240,22 @@ exports.postDeleteProduct = (req, res, next) => {
       res.redirect("/admin/products");
     })
     .catch((err) => next(err));
+};
+exports.deleteProduct = (req, res, next) => {
+  const prodId = req.params.productId;
+
+  Product.findById(prodId)
+    .then((product) => {
+      if (!product) return next(new Error("Product not found"));
+      fileHelper.deleteFile(product.imageUrl.slice(1));
+      return Product.deleteOne({ _id: prodId, userId: req.user._id });
+    })
+    .then((product) => {
+      // res.redirect("/admin/products");
+      res.status(200).json({"message":"Success!"})
+    })
+    .catch((err) => {
+      res.status(200).json({"message":"Deleting product failed"})
+      next(err)
+    });
 };
