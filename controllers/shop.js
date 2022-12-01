@@ -2,6 +2,7 @@ const Order = require("../models/order");
 const Product = require("../models/product");
 const fs = require('fs');
 const path = require('path');
+const PDFDocument = require('pdfkit');
 
 exports.getIndex = (req, res, next) => {
 
@@ -179,6 +180,23 @@ exports.getInvoice = (req, res, next)=>{
     const invoiceName = 'invoice-'+orderId+".pdf";
     const invoicePath = path.join('data', 'invoices', invoiceName);
 
+    const pdfDoc = new PDFDocument();
+    pdfDoc.pipe(fs.createWriteStream(invoicePath));
+    pdfDoc.pipe(res);
+
+    pdfDoc.fontSize(26).text("Invoice",{underline:true});
+    
+    pdfDoc.text("------------------------------------------------");
+
+    let totalPrice = 0;
+    order.products.forEach(p=>{
+      totalPrice += p.quantity * p.product.price;
+      pdfDoc.fontSize(14).
+      text(p.product.title + " - "+p.quantity+" x "+"$"+p.product.price);
+    })
+    pdfDoc.text("-------------------------------------------------");
+    pdfDoc.fontSize(20).text("Total Price: $"+totalPrice);
+    pdfDoc.end();
     //with this function, file data is read into memory, which might overflow when there
     // are huge incoming requests and file size is large
     // fs.readFile(invoicePath, (err, data)=>{
@@ -192,10 +210,10 @@ exports.getInvoice = (req, res, next)=>{
       
     // with this method, the entire data is not loaded in memory
     // instead the data is sent to browser chunk by chunk
-    const file = fs.createReadStream(invoicePath);
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'inline; filename="'+invoiceName+'"');
-    file.pipe(res);
+    // const file = fs.createReadStream(invoicePath);
+    // res.setHeader('Content-Type', 'application/pdf');
+    // res.setHeader('Content-Disposition', 'inline; filename="'+invoiceName+'"');
+    // file.pipe(res);
   })
   .catch(e=>console.log(e));
 }
