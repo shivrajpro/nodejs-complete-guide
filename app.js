@@ -4,9 +4,14 @@ const session = require("express-session");
 const multer = require("multer");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const path = require("path");
+const fs = require('fs');
 const flash = require("connect-flash");
 
 const mongoose = require("mongoose");
+
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -22,6 +27,12 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: "sessions", //name of the collection where session will be stored
 });
+
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags:'a'})
+app.use(helmet());
+app.use(compression());
+app.use(morgan('combined', {stream:accessLogStream}));
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public"))); //public folder contains static resources like js and css
 app.use("/images",express.static(path.join(__dirname, "images"))); //public folder contains static resources like js and css
