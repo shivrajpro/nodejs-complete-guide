@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
 const ITEMS_PER_PAGE = 1;
-const stripe = require('stripe')('sk_test_51MAGVfSDBzPpT6ABpwYIO50ZjG6T8JSM0Wx7NWlOx4VilwaIWdl7UZrfuZBSCTGnJKvek9Lm4Z0tv371iYhGcSLx00fU0KbA66');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
+
 exports.getIndex = (req, res, next) => {
   const page = +req.query.page || 1;
   let totalItems;

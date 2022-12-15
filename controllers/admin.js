@@ -241,6 +241,7 @@ exports.postDeleteProduct = (req, res, next) => {
     })
     .catch((err) => next(err));
 };
+
 exports.deleteProduct = (req, res, next) => {
   const prodId = req.params.productId;
 

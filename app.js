@@ -6,8 +6,6 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const path = require("path");
 const flash = require("connect-flash");
 
-const MONGODB_URI =
-  "mongodb+srv://shivraj:shiv@cluster0.bu9ow60.mongodb.net/shop";
 const mongoose = require("mongoose");
 
 const adminRoutes = require("./routes/admin");
@@ -17,6 +15,8 @@ const authRoutes = require("./routes/auth");
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 
+const MONGODB_URI =
+  `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.bu9ow60.mongodb.net/${process.env.MONGO_DATABASE}`;
 const app = express();
 const store = new MongoDBStore({
   uri: MONGODB_URI,
@@ -97,8 +97,7 @@ mongoose
   .connect(MONGODB_URI)
   .then((result) => {
     console.log("CONNECTED");
-    app.listen(3000);
+    app.listen(process.env.PORT || 3000);
+  }).catch(e=>{
+    console.log(e)
   })
-  .then((e) => {
-    console.log(e);
-  });
